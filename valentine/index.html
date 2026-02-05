@@ -194,14 +194,21 @@
       color:white;
     }
     .no{
-      background: rgba(255,255,255,.85);
-      color: var(--text);
-      border: 1px solid rgba(255,79,165,.25);
-      position:absolute; /* so it can teleport inside .btn-row */
-      right: 10%;
-      top: 50%;
-      transform: translateY(-50%);
-    }
+  background: rgba(255,255,255,.85);
+  color: var(--text);
+  border: 1px solid rgba(255,79,165,.25);
+
+  position: fixed;         
+  left: 0; top: 0;         
+  transform: none;
+  z-index: 10001;
+}
+
+.no-placeholder{
+  width: 0;
+  height: 0;
+}
+
 
     .tiny-note{
       text-align:center;
@@ -315,9 +322,14 @@
         </div>
 
         <div class="btn-row" id="arena">
-          <button class="yes" id="yesBtn">Yes 💘</button>
-          <button class="no" id="noBtn" type="button" aria-label="No (teleports)">No 🙃</button>
-        </div>
+  <button class="yes" id="yesBtn">Yes 💘</button>
+
+  <!-- keeps spacing in the row after we move the real No button to the body -->
+  <div class="no-placeholder" id="noPlaceholder" aria-hidden="true"></div>
+
+  <button class="no" id="noBtn" type="button" aria-label="No (teleports)">No 🙃</button>
+</div>
+
 
         <div class="tiny-note">Made with extra hearts: 💗💓💞💘</div>
       </div>
@@ -344,7 +356,6 @@
 
 
   <script>
-    // Extra floating hearts
     (function makeHearts(){
       const colors = ["#ff4fa5", "#ff8fc7", "#ff6bb5", "#ff9ad1"];
       for(let i=0;i<18;i++){
@@ -367,34 +378,56 @@
     const screenAsk = document.getElementById("screen-ask");
     const screenYes = document.getElementById("screen-yes");
     const backBtn = document.getElementById("backBtn");
+	
+document.body.appendChild(noBtn);
 
-    // Teleport the "No" button inside the arena
-    function teleportNo(){
-      const a = arena.getBoundingClientRect();
-      const b = noBtn.getBoundingClientRect();
+function placeNoNextToYes() {
+  const yes = yesBtn.getBoundingClientRect();
+  const no  = noBtn.getBoundingClientRect();
+  const gap = 12;
 
-      // Keep it inside arena with padding
-      const padding = 6;
-      const maxX = Math.max(padding, a.width - b.width - padding);
-      const maxY = Math.max(padding, a.height - b.height - padding);
+  let x = yes.right + gap;
+  let y = yes.top;
 
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
+  if (x + no.width > window.innerWidth) {
+    x = yes.left;
+    y = yes.bottom + gap;
+  }
 
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-      noBtn.style.right = "auto";
-      noBtn.style.transform = "none";
-    }
+  noBtn.style.left = x + "px";
+  noBtn.style.top  = y + "px";
+}
 
-    // Start with a fun position
-    teleportNo();
+function teleportNo() {
+  const yes = yesBtn.getBoundingClientRect();
+  const no  = noBtn.getBoundingClientRect();
+  const pad = 10;
 
-    // On click/tap, teleport
-    noBtn.addEventListener("click", teleportNo);
-    // Also teleport if she tries to press and hold (mobile)
-    noBtn.addEventListener("touchstart", (e) => { teleportNo(); }, {passive:true});
+  const maxX = window.innerWidth  - no.width  - pad;
+  const maxY = window.innerHeight - no.height - pad;
 
+  const x = Math.random() * maxX;
+  const y = Math.max(
+    yes.top,
+    Math.random() * maxY
+  );
+
+  noBtn.style.left = x + "px";
+  noBtn.style.top  = y + "px";
+}
+
+// start position
+placeNoNextToYes();
+
+// move when clicked / tapped
+noBtn.addEventListener("click", teleportNo);
+noBtn.addEventListener("touchstart", teleportNo, { passive: true });
+
+// reset on resize
+window.addEventListener("resize", placeNoNextToYes);
+
+
+    
     // Yes -> switch screens
     const overlay = document.getElementById("transitionOverlay");
 
@@ -422,6 +455,7 @@ yesBtn.addEventListener("click", () => {
   setTimeout(() => {
     screenAsk.classList.remove("active");
     screenYes.classList.add("active");
+	noBtn.style.display = "none";
     window.scrollTo({top:0, behavior:"smooth"});
   }, 520);
 
@@ -436,13 +470,12 @@ yesBtn.addEventListener("click", () => {
     backBtn.addEventListener("click", () => {
       screenYes.classList.remove("active");
       screenAsk.classList.add("active");
-      teleportNo();
+      noBtn.style.display = "block";
+	  placeNoNextToYes();
       window.scrollTo({top:0, behavior:"smooth"});
     });
 	
 
-    // If screen size changes, keep no button inside
-    window.addEventListener("resize", teleportNo);
   </script>
 </body>
 </html>
