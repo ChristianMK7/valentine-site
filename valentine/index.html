@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Valentine?</title>
+  <title>Hi my love</title>
   <style>
     :root{
       --pink-1:#ffe6f0;
@@ -203,6 +203,16 @@
   transform: none;
   z-index: 10001;
 }
+.no{
+  transition: transform 0.15s ease, padding 0.15s ease, font-size 0.15s ease;
+}
+
+.no.shrink{
+  padding: 10px 12px;
+  font-size: 13px;
+  border-radius: 12px;
+}
+
 
 .no-placeholder{
   width: 0;
@@ -257,12 +267,27 @@
       font-weight: 900;
     }
 
-    /* Mobile tweaks */
     @media (max-width: 420px){
-      .btn-row{ height: 96px; }
-      button{ width: 46%; }
-      .no{ width: 46%; }
-    }
+  .btn-row{ height: 96px; }
+
+  button{
+    width: 44%;
+    font-size: 14px;
+    padding: 12px 12px;
+    border-radius: 14px;
+  }
+
+  .no{ width: 44%; }
+
+  /* After teleport, make No even smaller */
+  .no.shrink{
+    width: auto;
+    font-size: 12px;
+    padding: 9px 10px;
+    border-radius: 12px;
+  }
+}
+
 	/* Yes transition overlay */
 #transitionOverlay{
   position: fixed;
@@ -378,10 +403,15 @@
     const screenAsk = document.getElementById("screen-ask");
     const screenYes = document.getElementById("screen-yes");
     const backBtn = document.getElementById("backBtn");
-	
+	let noScale = 1;
+
 document.body.appendChild(noBtn);
+noBtn.classList.remove("shrink");
 
 function placeNoNextToYes() {
+  noScale = 1;
+  noBtn.style.transform = "scale(1)";
+
   const yes = yesBtn.getBoundingClientRect();
   const no  = noBtn.getBoundingClientRect();
   const gap = 12;
@@ -398,7 +428,12 @@ function placeNoNextToYes() {
   noBtn.style.top  = y + "px";
 }
 
+
 function teleportNo() {
+  noBtn.classList.add("shrink");
+  noScale = Math.max(0.6, noScale - 0.06); // stops at 60%
+  noBtn.style.transform = `scale(${noScale})`;
+
   const yes = yesBtn.getBoundingClientRect();
   const no  = noBtn.getBoundingClientRect();
   const pad = 10;
@@ -415,6 +450,7 @@ function teleportNo() {
   noBtn.style.left = x + "px";
   noBtn.style.top  = y + "px";
 }
+
 
 // start position
 placeNoNextToYes();
@@ -468,12 +504,17 @@ yesBtn.addEventListener("click", () => {
 
     // Back button
     backBtn.addEventListener("click", () => {
-      screenYes.classList.remove("active");
-      screenAsk.classList.add("active");
-      noBtn.style.display = "block";
-	  placeNoNextToYes();
-      window.scrollTo({top:0, behavior:"smooth"});
-    });
+  noScale = 1;
+  noBtn.style.transform = "scale(1)";
+  noBtn.classList.remove("shrink");
+
+  screenYes.classList.remove("active");
+  screenAsk.classList.add("active");
+  noBtn.style.display = "block";
+  placeNoNextToYes();
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
 	
 
   </script>
