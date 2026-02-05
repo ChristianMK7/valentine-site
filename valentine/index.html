@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine?</title>
+  <style>
+    :root{
+      --pink-1:#ffe6f0;
+      --pink-2:#ffd1e6;
+      --pink-3:#ff8fc7;
+      --pink-4:#ff4fa5;
+      --text:#3b0a26;
+      --card:rgba(255,255,255,.72);
+      --shadow: 0 18px 45px rgba(255,79,165,.25);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      min-height:100svh;
+      display:grid;
+      place-items:center;
+      padding:18px;
+      overflow:hidden;
+      background:
+        radial-gradient(1000px 700px at 20% 10%, #fff 0%, transparent 60%),
+        radial-gradient(900px 650px at 80% 20%, #fff 0%, transparent 55%),
+        linear-gradient(135deg, var(--pink-1), var(--pink-2));
+      position:relative;
+    }
+
+    /* Floating hearts background */
+    .heart{
+      position:absolute;
+      width:18px; height:18px;
+      transform: rotate(45deg);
+      opacity:.22;
+      animation: floatUp linear infinite;
+      filter: drop-shadow(0 6px 12px rgba(255,79,165,.35));
+    }
+    .heart::before,.heart::after{
+      content:"";
+      position:absolute;
+      width:18px;height:18px;
+      background: currentColor;
+      border-radius:50%;
+    }
+    .heart{ background: currentColor; }
+    .heart::before{ left:-9px; top:0; }
+    .heart::after{ left:0; top:-9px; }
+
+    @keyframes floatUp{
+      from{ transform:translateY(30svh) rotate(45deg); }
+      to{ transform:translateY(-120svh) rotate(45deg); }
+    }
+
+    .wrap{
+      width:min(680px, 100%);
+      position:relative;
+      z-index:2;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    .top-badge{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      align-items:center;
+      font-weight:700;
+      color: rgba(59,10,38,.8);
+      margin-bottom: 10px;
+      font-size: 14px;
+      letter-spacing:.2px;
+    }
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(255,79,165,.18);
+    }
+
+    .heart-frame{
+      position:relative;
+      padding: 18px 14px 14px;
+      border-radius: 22px;
+      background:
+        radial-gradient(600px 220px at 50% 0%, rgba(255,79,165,.18), transparent 60%),
+        radial-gradient(500px 180px at 20% 20%, rgba(255,143,199,.18), transparent 60%),
+        rgba(255,255,255,.7);
+      border: 1px solid rgba(255,79,165,.18);
+      overflow:hidden;
+    }
+
+    .heart-ring{
+      position:absolute;
+      inset:-12px;
+      pointer-events:none;
+      opacity:.8;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,79,165,.25) 0 10px, transparent 11px),
+        radial-gradient(circle at 88% 22%, rgba(255,143,199,.25) 0 10px, transparent 11px),
+        radial-gradient(circle at 30% 90%, rgba(255,79,165,.22) 0 10px, transparent 11px),
+        radial-gradient(circle at 70% 92%, rgba(255,143,199,.22) 0 10px, transparent 11px);
+      filter: blur(.2px);
+    }
+
+    h1{
+      margin: 6px 0 6px;
+      font-size: clamp(26px, 5vw, 40px);
+      line-height:1.1;
+      text-align:center;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .sub{
+      text-align:center;
+      margin: 0 0 14px;
+      font-size: 14px;
+      opacity:.8;
+    }
+
+    .photo{
+      margin: 10px auto 14px;
+      width: min(420px, 100%);
+      aspect-ratio: 16/11;
+      border-radius: 18px;
+      border: 2px dashed rgba(255,79,165,.45);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.55));
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      position:relative;
+    }
+    .photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:none; /* shown when you add an image src */
+    }
+    .photo .hint{
+      text-align:center;
+      padding: 14px;
+      font-weight:700;
+      color: rgba(59,10,38,.65);
+    }
+    .photo small{
+      display:block;
+      font-weight:600;
+      opacity:.75;
+      margin-top:6px;
+    }
+
+    .btn-row{
+      position:relative;
+      height: 84px; /* space for teleporting No button */
+      width:min(520px, 100%);
+      margin: 0 auto;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap: 14px;
+      touch-action: manipulation;
+    }
+
+    button{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      font-weight: 900;
+      font-size: 16px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      transition: transform .12s ease, box-shadow .12s ease;
+      box-shadow: 0 12px 24px rgba(0,0,0,.08);
+      user-select:none;
+    }
+    button:active{ transform: scale(.98); }
+
+    .yes{
+      background: linear-gradient(135deg, var(--pink-4), var(--pink-3));
+      color:white;
+    }
+    .no{
+      background: rgba(255,255,255,.85);
+      color: var(--text);
+      border: 1px solid rgba(255,79,165,.25);
+      position:absolute; /* so it can teleport inside .btn-row */
+      right: 10%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .tiny-note{
+      text-align:center;
+      margin-top: 12px;
+      font-size: 12px;
+      opacity:.7;
+    }
+
+    /* Screen switching */
+    .screen{ display:none; }
+    .screen.active{ display:block; }
+
+    .congrats{
+      text-align:center;
+      padding: 8px 6px;
+    }
+    .congrats h2{
+      margin: 4px 0 6px;
+      font-size: clamp(22px, 4.8vw, 34px);
+      font-weight: 950;
+    }
+    .congrats p{
+      margin: 6px auto 10px;
+      max-width: 46ch;
+      font-weight: 650;
+      opacity:.85;
+    }
+    .gift{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      justify-content:center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,79,165,.22);
+      background: rgba(255,255,255,.75);
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
+    .back{
+      margin-top: 12px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,79,165,.22);
+      color: var(--text);
+      font-weight: 900;
+    }
+
+    /* Mobile tweaks */
+    @media (max-width: 420px){
+      .btn-row{ height: 96px; }
+      button{ width: 46%; }
+      .no{ width: 46%; }
+    }
+	/* Yes transition overlay */
+#transitionOverlay{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(900px 600px at 50% 30%, rgba(255,255,255,.65), rgba(255,255,255,0));
+  transition: opacity 420ms ease;
+  z-index: 9999;
+}
+#transitionOverlay.on{ opacity: 1; }
+
+.burst-heart{
+  position: fixed;
+  bottom: -30px;
+  width: 16px;
+  height: 16px;
+  transform: rotate(45deg);
+  opacity: 0.95;
+  filter: drop-shadow(0 10px 22px rgba(255,79,165,.35));
+  z-index: 10000;
+  animation: burstFloat var(--dur) ease-in forwards;
+}
+.burst-heart::before, .burst-heart::after{
+  content:"";
+  position:absolute;
+  width:16px; height:16px;
+  background: currentColor;
+  border-radius:50%;
+}
+.burst-heart{ background: currentColor; }
+.burst-heart::before{ left:-8px; top:0; }
+.burst-heart::after{ left:0; top:-8px; }
+
+@keyframes burstFloat{
+  0%   { transform: translateY(0) rotate(45deg) scale(var(--s)); opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: translateY(calc(-100svh - 80px)) rotate(45deg) scale(var(--s)); opacity: 0; }
+}
+
+  </style>
+</head>
+
+<body>
+  <!-- floating hearts (generated by JS too, but a few static looks nice) -->
+  <div class="heart" style="left:10%; bottom:-10%; color:#ff4fa5; animation-duration:10s; animation-delay:-1s;"></div>
+  <div class="heart" style="left:70%; bottom:-20%; color:#ff8fc7; animation-duration:12s; animation-delay:-4s;"></div>
+  <div class="heart" style="left:35%; bottom:-25%; color:#ff4fa5; animation-duration:14s; animation-delay:-6s;"></div>
+
+  <main class="wrap">
+    <section class="card screen active" id="screen-ask" aria-label="Valentine question screen">
+      <div class="heart-frame">
+        <div class="heart-ring"></div>
+        <h1>Will you be my Valentine? 💖</h1>
+        <div class="photo" id="photo1">
+               <img src="willyou.jpeg" alt="Us" style="display:block;">
+        </div>
+
+        <div class="btn-row" id="arena">
+          <button class="yes" id="yesBtn">Yes 💘</button>
+          <button class="no" id="noBtn" type="button" aria-label="No (teleports)">No 🙃</button>
+        </div>
+
+        <div class="tiny-note">Made with extra hearts: 💗💓💞💘</div>
+      </div>
+    </section>
+
+    <section class="card screen" id="screen-yes" aria-label="Congratulations screen">
+      <div class="congrats">
+        <h2>Congrats! You are now Christian’s Valentine this year!! 💖</h2>
+        <p>Nowww… there’s a tiny surprise waiting for you!</p>
+
+        <div class="photo" id="photo2">
+               <img src="valentine1.jpeg" alt="Gift hint" style="display:block;">
+        </div>
+
+        <div class="gift">Check all the super hot places in the house for a small gift!</div>
+
+        <div>
+          <button class="back" id="backBtn">Back</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="transitionOverlay"></div>
+
+
+  <script>
+    // Extra floating hearts
+    (function makeHearts(){
+      const colors = ["#ff4fa5", "#ff8fc7", "#ff6bb5", "#ff9ad1"];
+      for(let i=0;i<18;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.style.left = Math.random()*100 + "%";
+        h.style.bottom = (-30 - Math.random()*40) + "%";
+        h.style.color = colors[Math.floor(Math.random()*colors.length)];
+        h.style.animationDuration = (9 + Math.random()*10) + "s";
+        h.style.animationDelay = (-Math.random()*12) + "s";
+        h.style.opacity = (0.12 + Math.random()*0.22).toFixed(2);
+        h.style.transform = `translateY(0) rotate(45deg) scale(${0.7 + Math.random()*1.1})`;
+        document.body.appendChild(h);
+      }
+    })();
+
+    const arena = document.getElementById("arena");
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const screenAsk = document.getElementById("screen-ask");
+    const screenYes = document.getElementById("screen-yes");
+    const backBtn = document.getElementById("backBtn");
+
+    // Teleport the "No" button inside the arena
+    function teleportNo(){
+      const a = arena.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+
+      // Keep it inside arena with padding
+      const padding = 6;
+      const maxX = Math.max(padding, a.width - b.width - padding);
+      const maxY = Math.max(padding, a.height - b.height - padding);
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+      noBtn.style.right = "auto";
+      noBtn.style.transform = "none";
+    }
+
+    // Start with a fun position
+    teleportNo();
+
+    // On click/tap, teleport
+    noBtn.addEventListener("click", teleportNo);
+    // Also teleport if she tries to press and hold (mobile)
+    noBtn.addEventListener("touchstart", (e) => { teleportNo(); }, {passive:true});
+
+    // Yes -> switch screens
+    const overlay = document.getElementById("transitionOverlay");
+
+function heartBurst(count = 26){
+  const colors = ["#ff4fa5", "#ff8fc7", "#ff6bb5", "#ff9ad1"];
+  for(let i=0; i<count; i++){
+    const h = document.createElement("div");
+    h.className = "burst-heart";
+    h.style.left = (Math.random() * 100) + "vw";
+    h.style.color = colors[Math.floor(Math.random()*colors.length)];
+    h.style.setProperty("--dur", (900 + Math.random()*700) + "ms");
+    h.style.setProperty("--s", (0.75 + Math.random()*1.25).toFixed(2));
+    h.style.animationDelay = (Math.random()*180) + "ms";
+    document.body.appendChild(h);
+    h.addEventListener("animationend", () => h.remove());
+  }
+}
+
+yesBtn.addEventListener("click", () => {
+  // start transition
+  overlay.classList.add("on");
+  heartBurst(30);
+
+  // switch screen after a short delay (so she sees the hearts)
+  setTimeout(() => {
+    screenAsk.classList.remove("active");
+    screenYes.classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  }, 520);
+
+  // fade overlay out
+  setTimeout(() => {
+    overlay.classList.remove("on");
+  }, 900);
+});
+
+
+    // Back button
+    backBtn.addEventListener("click", () => {
+      screenYes.classList.remove("active");
+      screenAsk.classList.add("active");
+      teleportNo();
+      window.scrollTo({top:0, behavior:"smooth"});
+    });
+	
+
+    // If screen size changes, keep no button inside
+    window.addEventListener("resize", teleportNo);
+  </script>
+</body>
+</html>
